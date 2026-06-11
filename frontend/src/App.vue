@@ -1,7 +1,5 @@
 <template>
-  <!-- 显示登录页面 -->
-
-  <Login />
+  <router-view />
 </template>
 
 <script setup>

@@ -8,7 +8,7 @@
       <div class="userPassword">
         <input type="password" id="password" placeholder="请输入密码" v-model="password" />
       </div>
-      <button class="login-button" id="login-button" @click="handleLogin">立即登录</button>
+      <button class="login-button" id="login-button" @click="handleLogin">登录</button>
       <p class="error-msg" v-if="errMsg">{{ errMsg }}</p>
     </div>
   </div>
@@ -123,10 +123,15 @@ button {
   border-radius: 20px;
   margin: 0 auto;
   background-color: rgb(214, 211, 211);
+  transition: all 0.3s ease;
   cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+  font-weight: 400;
 }
 button:hover {
   background-color: rgb(190, 190, 190);
+  transform: scale(1.05);
 }
 
 .error-msg {
