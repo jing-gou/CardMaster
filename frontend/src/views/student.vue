@@ -10,18 +10,26 @@
     </div>
     <main class="information">
       <div v-if="active === 1">
-        <p>卡号{{ userData.cardid }}</p>
+        <p>卡号ID{{ userData.cardid }}</p>
 
-        <p>姓名{{ userData.name }}</p>
+        <p>姓名Name{{ userData.name }}</p>
 
-        <p>余额{{ userData.balance }}</p>
+        <p>余额Balance{{ userData.balance }}</p>
 
-        <p>上机时间{{ userData.onTime }}</p>
+        <p>上机时间loginTime{{ userData.onTime }}</p>
 
-        <p>上机地点{{ userData.onAddress }}</p>
+        <p>上机地点loginAddress{{ userData.onAddress }}</p>
       </div>
       <div v-if="active === 2">内容区域 2：上机日志</div>
-      <div v-if="active === 3">内容区域 3：账户充值</div>
+      <div v-if="active === 3">
+        <div class="charge">
+          <input
+            type="text"
+            placeholder="请输入充值金额"
+            oninput="value = value.replace(/^\D*(\d*(?:\.\d{0,2})?).*$/g, '$1')"
+          />
+        </div>
+      </div>
       <div v-if="active === 4">内容区域 4：系统设置</div>
       <div v-if="active === 5">内容区域 5：系统设置</div>
     </main>
@@ -79,7 +87,9 @@
   font-size: 18px;
 }
 .information {
-  /* line-height: 80px; */
+  padding-left: 40px;
+  font-size: 16px;
+  line-height: 80px;
   border-radius: 20px;
   box-shadow:
     0 4px 12px rgba(67, 44, 44, 0.15),
