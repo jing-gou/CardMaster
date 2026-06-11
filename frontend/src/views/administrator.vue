@@ -9,12 +9,23 @@
     <main class="information">
       <div v-if="active === 1">
         <p>充值功能</p>
+        <input v-model="chargeCardid" placeholder="请输入卡号" />
+        <input v-model="chargeAmount" placeholder="请输入金额" />
+        <button @click="handleRecharge">充值</button>
+        <p v-if="chargeMsg">{{ chargeMsg }}</p>
       </div>
       <div v-if="active === 2">
         <p>挂失功能</p>
+        <input v-model="lostCardid" placeholder="请输入卡号" />
+        <button @click="handleReportLost">挂失</button>
+        <p v-if="lostMsg">{{ lostMsg }}</p>
       </div>
       <div v-if="active === 3">
         <p>重置学生密码</p>
+        <input v-model="resetCardid" placeholder="请输入卡号" />
+        <input v-model="resetNewPwd" placeholder="请输入新密码" />
+        <button @click="handleResetPwd">重置</button>
+        <p v-if="resetMsg">{{ resetMsg }}</p>
       </div>
     </main>
   </div>
@@ -106,11 +117,25 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { isLoggedIn, clearToken } from "../api/login.js";
+import { isLoggedIn, clearToken, recharge, reportLost, resetPassword } from "../api/login.js";
 
-const isdebug = true; // 开发阶段允许直接访问管理员界面，生产环境请设置为 false
+const isdebug = true;
 const router = useRouter();
 const active = ref(1);
+
+/* 充值相关 */
+const chargeCardid = ref("");
+const chargeAmount = ref("");
+const chargeMsg = ref("");
+
+/* 挂失相关 */
+const lostCardid = ref("");
+const lostMsg = ref("");
+
+/* 重置密码相关 */
+const resetCardid = ref("");
+const resetNewPwd = ref("");
+const resetMsg = ref("");
 
 const Content = (num) => {
   active.value = num;
@@ -122,6 +147,36 @@ onMounted(() => {
     router.push("/");
   }
 });
+
+/* 充值 */
+const handleRecharge = async () => {
+  if (!chargeCardid.value || !chargeAmount.value) {
+    chargeMsg.value = "请输入卡号和金额";
+    return;
+  }
+  const data = await recharge(chargeCardid.value, Number(chargeAmount.value));
+  chargeMsg.value = data.message;
+};
+
+/* 挂失 */
+const handleReportLost = async () => {
+  if (!lostCardid.value) {
+    lostMsg.value = "请输入卡号";
+    return;
+  }
+  const data = await reportLost(lostCardid.value);
+  lostMsg.value = data.message;
+};
+
+/* 重置密码 */
+const handleResetPwd = async () => {
+  if (!resetCardid.value || !resetNewPwd.value) {
+    resetMsg.value = "请输入卡号和新密码";
+    return;
+  }
+  const data = await resetPassword(resetCardid.value, resetNewPwd.value);
+  resetMsg.value = data.message;
+};
 
 /* 退出登录 */
 const handleLogout = () => {

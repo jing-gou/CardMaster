@@ -251,12 +251,14 @@ static void handle_find_income(struct mg_connection *c, struct mg_http_message *
 static void handle_get_student_info(struct mg_connection *c, struct mg_http_message *hm){
     char cardid[20] = {0};
     User user;
+    Record last_record;
     mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
 
-    int result = get_student_info(cardid, &user);
+    int result = get_student_info(cardid, &user, &last_record);
     if(result == 0){
-        send_json(c, 200, "{\"code\":0,\"cardid\":\"%s\",\"name\":\"%s\",\"stuid\":\"%s\",\"balance\":%.2f,\"status\":%d}",
-                  user.cardid, user.name, user.stuid, user.balance, (int)user.status);
+        send_json(c, 200, "{\"code\":0,\"cardid\":\"%s\",\"name\":\"%s\",\"stuid\":\"%s\",\"balance\":%.2f,\"status\":%d,\"time\":\"%s\",\"address\":\"%s\"}",
+                  user.cardid, user.name, user.stuid, user.balance, (int)user.status,
+                  last_record.time, last_record.address);
     } else {
         send_json(c, 200, "{\"code\":-1,\"message\":\"用户不存在\"}");
     }
@@ -292,6 +294,30 @@ static void handle_end_session(struct mg_connection *c, struct mg_http_message *
     } else {
         send_json(c, 200, "{\"code\":-1,\"message\":\"没有正在上机的记录\"}");
     }
+}
+
+/* handle_get_records: 处理查询上机记录请求 */
+static void handle_get_records(struct mg_connection *c, struct mg_http_message *hm){
+    char cardid[20] = {0};
+    Record records[MAX_RECORDS];
+    int record_count = 0;
+    int i;
+
+    mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
+    load_records(cardid, records, &record_count);
+
+    /* 手动构造 JSON 数组 */
+    char buf[4096] = "{\"code\":0,\"records\":[";
+    for(i = 0; i < record_count; i++){
+        if(i > 0) strcat(buf, ",");
+        char item[256];
+        snprintf(item, sizeof(item), "{\"date\":\"%s\",\"time\":\"%s\",\"duration\":%d,\"isOnline\":%d,\"address\":\"%s\"}",
+                 records[i].date, records[i].time, records[i].duration, records[i].isOnline, records[i].address);
+        strcat(buf, item);
+    }
+    strcat(buf, "]}");
+
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", buf);
 }
 
 /* handle_verify_token: 处理 token 验证请求 */
@@ -363,6 +389,10 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 学生：下机接口 */
     else if(strncmp(hm->uri.buf, "/api/student/end_session", 24) == 0){
         handle_end_session(c, hm);
+    }
+    /* 学生：查询上机记录接口 */
+    else if(strncmp(hm->uri.buf, "/api/student/records", 20) == 0){
+        handle_get_records(c, hm);
     }
     /* Token 验证接口 */
     else if(strncmp(hm->uri.buf, "/api/verify_token", 17) == 0){

@@ -8,7 +8,7 @@
       <div class="item1 item" @click="Content(1)">账户信息</div>
       <div class="item2 item" @click="Content(2)">上机日志</div>
       <div class="item3 item" @click="Content(3)">账户充值</div>
-      <div class="item4 item" @click="Content(4)">按钮4</div>
+      <div class="item4 item" @click="Content(4)">修改密码</div>
       <div class="item5 item" @click="Content(5)">按钮5</div>
     </div>
     <main class="information">
@@ -23,7 +23,26 @@
 
         <p>上机地点loginAddress{{ userData.onAddress }}</p>
       </div>
-      <div v-if="active === 2">内容区域 2：上机日志</div>
+      <div v-if="active === 2">
+        <p>上机日志</p>
+        <table v-if="records.length > 0">
+          <tr>
+            <th>日期</th>
+            <th>时间</th>
+            <th>时长(分钟)</th>
+            <th>地点</th>
+            <th>状态</th>
+          </tr>
+          <tr v-for="(rec, index) in records" :key="index">
+            <td>{{ rec.date }}</td>
+            <td>{{ rec.time }}</td>
+            <td>{{ rec.duration }}</td>
+            <td>{{ rec.address }}</td>
+            <td>{{ rec.isOnline ? '上机中' : '已下机' }}</td>
+          </tr>
+        </table>
+        <p v-else>暂无上机记录</p>
+      </div>
       <div v-if="active === 3">
         <div class="charge">
           <input
@@ -34,7 +53,13 @@
           <button class="charge-btn">充值</button>
         </div>
       </div>
-      <div v-if="active === 4">内容区域 4：系统设置</div>
+      <div v-if="active === 4">
+        <p>修改密码</p>
+        <input v-model="oldPwd" type="password" placeholder="旧密码" />
+        <input v-model="newPwd" type="password" placeholder="新密码" />
+        <button @click="handleChangePwd">确认修改</button>
+        <p v-if="pwdMsg">{{ pwdMsg }}</p>
+      </div>
       <div v-if="active === 5">内容区域 5：系统设置</div>
     </main>
   </div>
@@ -138,20 +163,30 @@ input {
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import {
-  isLoggedIn,
-  getCardid,
-  getStudentInfo,
-  endSession,
-} from "../api/login.js";
+import { isLoggedIn, getCardid, getStudentInfo, endSession, changePassword, getRecords } from "../api/login.js";
 
-const isdebug = true; // 开发阶段允许直接访问学生界面，生产环境请设置为 false
+const isdebug = true;
 const router = useRouter();
 const active = ref(1);
 const cardid = ref("");
 
-const Content = (num) => {
+/* 修改密码相关 */
+const oldPwd = ref("");
+const newPwd = ref("");
+const pwdMsg = ref("");
+
+/* 上机日志相关 */
+const records = ref([]);
+
+const Content = async (num) => {
   active.value = num;
+  /* 切换到上机日志时加载数据 */
+  if (num === 2 && cardid.value) {
+    const data = await getRecords(cardid.value);
+    if (data.code === 0) {
+      records.value = data.records;
+    }
+  }
 };
 
 const userData = ref({
@@ -175,8 +210,26 @@ onMounted(async () => {
     userData.value.cardid = data.cardid;
     userData.value.name = data.name;
     userData.value.balance = data.balance;
+    userData.value.onTime = data.time;
+    userData.value.onAddress = data.address;
   }
 });
+
+/* 修改密码 */
+const handleChangePwd = async () => {
+  if (!oldPwd.value || !newPwd.value) {
+    pwdMsg.value = "请输入旧密码和新密码";
+    return;
+  }
+  const data = await changePassword(cardid.value, oldPwd.value, newPwd.value);
+  if (data.code === 0) {
+    pwdMsg.value = "修改成功";
+    oldPwd.value = "";
+    newPwd.value = "";
+  } else {
+    pwdMsg.value = data.message;
+  }
+};
 
 /* 下机 */
 const handleLogout = async () => {

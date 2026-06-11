@@ -226,3 +226,19 @@ export async function changePassword(cardid, oldPassword, newPassword) {
   })
   return await resp.json()
 }
+
+/**
+ * 查询上机记录
+ * @param {string} cardid - 卡号
+ * @returns {Promise<{code: number, records: Array}>}
+ */
+export async function getRecords(cardid) {
+  const body = 'cardid=' + encodeURIComponent(cardid)
+
+  const resp = await fetch('/api/student/records', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
