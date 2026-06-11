@@ -1,0 +1,27 @@
+// <template>
+//   <!-- <div class="student-page">
+//     <h2>学生页面</h2>
+//     <p>卡号{{ userData.cardid }}</p>
+//     <p>姓名{{ userData.name }}</p>
+//     <p>余额{{ userData.balance }}</p>
+//     <p>上机时间{{ userData.onTime }}</p>
+//     <p>上机地点{{ userData.onAddress }}</p>
+//   </div> -->
+// </template>
+// <script setup>
+// import { ref } from "vue";
+
+// const userData = ref({
+//   cardid: "",
+//   name: "",
+//   balance: "",
+//   onTime: "",
+//   onAddress: "",
+// });
+// </script>
+// <style scoped>
+// .student-page {
+//   width: 200px;
+//   height: 200px;
+// }
+// </style>
