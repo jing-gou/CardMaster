@@ -31,6 +31,7 @@
             placeholder="请输入充值金额"
             oninput="value = value.replace(/^\D*(\d*(?:\.\d{0,2})?).*$/g, '$1')"
           />
+          <button class="charge-btn">充值</button>
         </div>
       </div>
       <div v-if="active === 4">内容区域 4：系统设置</div>
