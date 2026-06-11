@@ -8,7 +8,7 @@
       <div class="userPassword">
         <input type="password" id="password" placeholder="请输入密码" />
       </div>
-      <button class="login-button" id="login-button">立即登录</button>
+      <button class="login-button" id="login-button">登录</button>
     </div>
   </div>
 </template>
@@ -43,7 +43,7 @@
   background: linear-gradient(45deg, #0779e3d3 50%, #dde1ea 50%);
   background-size: 200% 200%;
   /* 斜向流动动画 */
-  animation: appleSlopeFlow 11s linear infinite;
+  animation: appleSlopeFlow 15s linear infinite;
   overflow: hidden;
 }
 
@@ -68,6 +68,7 @@
 }
 
 h2 {
+  font-size: 28px;
   color: rgb(56 50 85);
 }
 .userName,
@@ -89,6 +90,7 @@ h2 {
   padding: 0 12px;
 }
 input {
+  background-color: rgb(237, 235, 235);
   margin: 0 auto;
   width: 50px;
   border-radius: 5px;
@@ -101,5 +103,14 @@ button {
   border-radius: 20px;
   margin: 0 auto;
   background-color: rgb(214, 211, 211);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+  font-weight: 400;
+}
+button:hover {
+  background-color: rgb(193, 191, 191);
+  transform: scale(1.05);
 }
 </style>
