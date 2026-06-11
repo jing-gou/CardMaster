@@ -23,13 +23,14 @@
 
 .containfather {
   width: 100%;
-  height: 550px;
-  margin-top: 100px;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: linear-gradient(45deg, #dde1ea 50%, #187bd6d3 50%);
 }
 .loginBox {
+  margin-top: -100px;
   width: 450px;
   height: 550px;
   /* background-color: rgb(17, 85, 145); */
