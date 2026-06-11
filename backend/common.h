@@ -50,6 +50,7 @@ void load_users(User users[], int *user_count);
 void save_users(User users[], int user_count);
 void load_records(char *stuid, Record records[], int *record_count);
 void save_records(char *stuid, const Record *REC);
+int delete_user(char *cardid);
 
 // auth.c
 LoginResult user_login(char *cardid, char *password, int *role);
@@ -59,5 +60,16 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm);
 
 // admin.c
 int create_student(char *cardid, char *name, char *stuid, char *password);
+int recharge(char *cardid, double amount);
+int report_lost(char *cardid);
+int reset_password(char *cardid, char *new_password);
+int delete_student(char *cardid);
+int search_student_info(char *cardid, User *user);
+int edit_student_info(char *cardid, char *name, char *stuid);
+double find_income(void);
+
+// student.c
+int get_student_info(char *cardid, User *user);
+int change_password(char *cardid, char *old_password, char *new_password);
 
 #endif // common_h

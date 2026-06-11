@@ -17,6 +17,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { login } from '../api/login.js'
 
 const router = useRouter()
 const cardid = ref('')
@@ -37,18 +38,8 @@ const handleLogin = async () => {
     return
   }
 
-  /* 构造表单数据 */
-  const body = 'cardid=' + encodeURIComponent(cardid.value) +
-               '&password=' + encodeURIComponent(password.value)
-
   try {
-    /* 发送 POST 请求到后端 */
-    const resp = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body
-    })
-    const data = await resp.json()
+    const data = await login(cardid.value, password.value)
 
     if (data.code === 0) {
       /* 登录成功，根据 role 跳转 */
@@ -58,7 +49,6 @@ const handleLogin = async () => {
         router.push('/admin')
       }
     } else {
-      /* 显示后端返回的错误信息 */
       errMsg.value = data.message
     }
   } catch (e) {

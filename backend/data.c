@@ -85,3 +85,30 @@ void save_records(char *stuid, const Record *REC){
     );
     fclose(fp);
 }
+
+/* delete_user: 从数据文件中删除指定用户
+ * 参数:
+ *   cardid - 要删除的卡号
+ * 返回:
+ *   0 删除成功
+ *  -1 用户不存在
+ */
+int delete_user(char *cardid){
+    User users[MAX_USERS];
+    int user_count = 0;
+    int i, j;
+
+    load_users(users, &user_count);
+
+    for(i = 0; i < user_count; i++){
+        if(strcmp(users[i].cardid, cardid) == 0){
+            for(j = i; j < user_count - 1; j++){
+                users[j] = users[j + 1];
+            }
+            user_count--;
+            save_users(users, user_count);
+            return 0;
+        }
+    }
+    return -1;
+}
