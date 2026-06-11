@@ -1,6 +1,9 @@
 <template>
   <div class="wrap">
-    <div class="header">学生系统 <button class="logout-btn" @click="handleLogout">退出登录</button></div>
+    <div class="header">
+      学生系统
+      <button class="logout-btn" @click="handleLogout">退出登录</button>
+    </div>
     <div class="safari">
       <div class="item1 item" @click="Content(1)">账户信息</div>
       <div class="item2 item" @click="Content(2)">上机日志</div>
@@ -146,6 +149,13 @@
 }
 .logout-btn:hover {
   background-color: #c0392b;
+}
+input {
+  width: 200px;
+  height: 40px;
+  border-radius: 20px;
+  border: none;
+  padding-left: 15px;
 }
 </style>
 
