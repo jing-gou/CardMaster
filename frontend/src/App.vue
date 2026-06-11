@@ -1,7 +1,7 @@
 <template>
   <!-- 显示登录页面 -->
 
-  <Login />
+  <student />
 </template>
 
 <script setup>
