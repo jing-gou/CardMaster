@@ -5,10 +5,11 @@ Thumbs.db
 # 依赖
 node_modules/
 
-# 编译产物
+# 编译产物（C 后端）
 *.o
 *.out
 *.exe
+*.dSYM/
 
 # 日志
 *.log
@@ -16,3 +17,9 @@ node_modules/
 # IDE
 .vscode/
 .idea/
+
+# 构建目录
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
