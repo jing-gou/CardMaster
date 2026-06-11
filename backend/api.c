@@ -27,12 +27,14 @@ static void send_json(struct mg_connection *c, int code, const char *fmt, ...){
 static void handle_login(struct mg_connection *c, struct mg_http_message *hm){
     char cardid[20] = {0};      /* 卡号 */
     char password[30] = {0};    /* 密码 */
+    char address[20] = {0};     /* 上机地点 */
     int role = 0;               /* 角色 */
     LoginResult result;         /* 登录结果 */
 
     /* 从 POST 请求体解析参数 */
     mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
     mg_http_get_var(&hm->body, "password", password, sizeof(password));
+    mg_http_get_var(&hm->body, "address", address, sizeof(address));
 
     /* 调用登录验证 */
     result = user_login(cardid, password, &role);
@@ -40,6 +42,13 @@ static void handle_login(struct mg_connection *c, struct mg_http_message *hm){
     /* 根据结果返回 JSON */
     switch(result){
         case LOGIN_SUCCESS:
+            /* 学生登录成功，自动记录上机 */
+            if(role == 0){
+                if(strlen(address) == 0){
+                    strncpy(address, "机房", sizeof(address) - 1);
+                }
+                start_session(cardid, address);
+            }
             send_json(c, 200, "{\"code\":0,\"role\":%d}", role);
             break;
         case LOGIN_WRONG_PWD:
@@ -270,6 +279,19 @@ static void handle_change_password(struct mg_connection *c, struct mg_http_messa
     }
 }
 
+/* handle_end_session: 处理学生下机请求 */
+static void handle_end_session(struct mg_connection *c, struct mg_http_message *hm){
+    char cardid[20] = {0};
+    mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
+
+    int result = end_session(cardid);
+    if(result == 0){
+        send_json(c, 200, "{\"code\":0,\"message\":\"下机成功\"}");
+    } else {
+        send_json(c, 200, "{\"code\":-1,\"message\":\"没有正在上机的记录\"}");
+    }
+}
+
 /* handle_api: API 路由总入口
  * 参数:
  *   c - 连接对象
@@ -319,6 +341,10 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 学生：修改密码接口 */
     else if(strncmp(hm->uri.buf, "/api/student/change_password", 28) == 0){
         handle_change_password(c, hm);
+    }
+    /* 学生：下机接口 */
+    else if(strncmp(hm->uri.buf, "/api/student/end_session", 24) == 0){
+        handle_end_session(c, hm);
     }
     /* 未匹配的接口 */
     else {
