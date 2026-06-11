@@ -29,7 +29,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { login } from "../api/login.js";
+import { login, saveToken } from "../api/login.js";
 
 const router = useRouter();
 const cardid = ref("");
@@ -54,6 +54,9 @@ const handleLogin = async () => {
     const data = await login(cardid.value, password.value);
 
     if (data.code === 0) {
+      /* 保存 token */
+      saveToken(data.token, data.cardid, data.role);
+
       /* 登录成功，根据 role 跳转 */
       if (data.role === 0) {
         router.push("/student");

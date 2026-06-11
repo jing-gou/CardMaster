@@ -49,7 +49,9 @@ static void handle_login(struct mg_connection *c, struct mg_http_message *hm){
                 }
                 start_session(cardid, address);
             }
-            send_json(c, 200, "{\"code\":0,\"role\":%d}", role);
+            /* 生成 token */
+            char *token = generate_token(cardid, role);
+            send_json(c, 200, "{\"code\":0,\"role\":%d,\"token\":\"%s\",\"cardid\":\"%s\"}", role, token, cardid);
             break;
         case LOGIN_WRONG_PWD:
             send_json(c, 200, "{\"code\":1,\"message\":\"密码错误\"}");
@@ -292,6 +294,22 @@ static void handle_end_session(struct mg_connection *c, struct mg_http_message *
     }
 }
 
+/* handle_verify_token: 处理 token 验证请求 */
+static void handle_verify_token(struct mg_connection *c, struct mg_http_message *hm){
+    char token[64] = {0};
+    char cardid[20] = {0};
+    int role = 0;
+
+    mg_http_get_var(&hm->body, "token", token, sizeof(token));
+
+    int result = verify_token(token, cardid, &role);
+    if(result == 0){
+        send_json(c, 200, "{\"code\":0,\"cardid\":\"%s\",\"role\":%d}", cardid, role);
+    } else {
+        send_json(c, 200, "{\"code\":-1,\"message\":\"token无效或已过期\"}");
+    }
+}
+
 /* handle_api: API 路由总入口
  * 参数:
  *   c - 连接对象
@@ -345,6 +363,10 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 学生：下机接口 */
     else if(strncmp(hm->uri.buf, "/api/student/end_session", 24) == 0){
         handle_end_session(c, hm);
+    }
+    /* Token 验证接口 */
+    else if(strncmp(hm->uri.buf, "/api/verify_token", 17) == 0){
+        handle_verify_token(c, hm);
     }
     /* 未匹配的接口 */
     else {

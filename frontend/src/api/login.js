@@ -3,6 +3,82 @@
  * 后端负责维护此文件
  */
 
+/* ========== Token 管理 ========== */
+
+/**
+ * 保存 token 到本地
+ * @param {string} token - token 字符串
+ * @param {string} cardid - 卡号
+ * @param {number} role - 角色
+ */
+export function saveToken(token, cardid, role) {
+  localStorage.setItem('token', token)
+  localStorage.setItem('cardid', cardid)
+  localStorage.setItem('role', role)
+}
+
+/**
+ * 获取本地存储的 token
+ * @returns {string|null}
+ */
+export function getToken() {
+  return localStorage.getItem('token')
+}
+
+/**
+ * 获取本地存储的卡号
+ * @returns {string|null}
+ */
+export function getCardid() {
+  return localStorage.getItem('cardid')
+}
+
+/**
+ * 获取本地存储的角色
+ * @returns {string|null}
+ */
+export function getRole() {
+  return localStorage.getItem('role')
+}
+
+/**
+ * 清除 token（退出登录）
+ */
+export function clearToken() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('cardid')
+  localStorage.removeItem('role')
+}
+
+/**
+ * 检查是否已登录
+ * @returns {boolean}
+ */
+export function isLoggedIn() {
+  return !!localStorage.getItem('token')
+}
+
+/**
+ * 验证 token 是否有效
+ * @returns {Promise<{code: number, cardid?: string, role?: number}>}
+ */
+export async function verifyToken() {
+  const token = getToken()
+  if (!token) {
+    return { code: -1, message: '未登录' }
+  }
+
+  const body = 'token=' + encodeURIComponent(token)
+  const resp = await fetch('/api/verify_token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+/* ========== 登录接口 ========== */
+
 /**
  * 用户登录
  * @param {string} cardid - 卡号

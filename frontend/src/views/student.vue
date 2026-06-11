@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <div class="header">学生系统</div>
+    <div class="header">学生系统 <button class="logout-btn" @click="handleLogout">退出登录</button></div>
     <div class="safari">
       <div class="item1 item" @click="Content(1)">账户信息</div>
       <div class="item2 item" @click="Content(2)">上机日志</div>
@@ -108,11 +108,31 @@
   background-color: #ccc;
   cursor: pointer;
 }
+.logout-btn {
+  float: right;
+  margin-right: 30px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #e74c3c;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+.logout-btn:hover {
+  background-color: #c0392b;
+}
 </style>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { isLoggedIn, getCardid, getStudentInfo, endSession } from "../api/login.js";
+
+const router = useRouter();
 const active = ref(1);
+const cardid = ref("");
+
 const Content = (num) => {
   active.value = num;
 };
@@ -124,4 +144,27 @@ const userData = ref({
   onTime: "",
   onAddress: "",
 });
+
+/* 页面加载时检查登录状态 */
+onMounted(async () => {
+  if (!isLoggedIn()) {
+    router.push("/");
+    return;
+  }
+  cardid.value = getCardid();
+  /* 加载学生信息 */
+  const data = await getStudentInfo(cardid.value);
+  if (data.code === 0) {
+    userData.value.cardid = data.cardid;
+    userData.value.name = data.name;
+    userData.value.balance = data.balance;
+  }
+});
+
+/* 下机 */
+const handleLogout = async () => {
+  await endSession(cardid.value);
+  localStorage.clear();
+  router.push("/");
+};
 </script>

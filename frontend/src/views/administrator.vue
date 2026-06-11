@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <div class="header">管理员系统</div>
+    <div class="header">管理员系统 <button class="logout-btn" @click="handleLogout">退出登录</button></div>
     <div class="safari">
       <div class="item1 item" @click="Content(1)">充值</div>
       <div class="item2 item" @click="Content(2)">挂失</div>
@@ -87,20 +87,44 @@
   font-size: 20px;
   cursor: pointer;
 }
+.logout-btn {
+  float: right;
+  margin-right: 30px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #e74c3c;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+.logout-btn:hover {
+  background-color: #c0392b;
+}
 </style>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { isLoggedIn, clearToken } from "../api/login.js";
+
+const router = useRouter();
 const active = ref(1);
+
 const Content = (num) => {
   active.value = num;
 };
 
-const userData = ref({
-  cardid: "",
-  name: "",
-  balance: "",
-  onTime: "",
-  onAddress: "",
+/* 页面加载时检查登录状态 */
+onMounted(() => {
+  if (!isLoggedIn()) {
+    router.push("/");
+  }
 });
+
+/* 退出登录 */
+const handleLogout = () => {
+  clearToken();
+  router.push("/");
+};
 </script>
