@@ -108,6 +108,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { isLoggedIn, clearToken } from "../api/login.js";
 
+const isdebug = true; // 开发阶段允许直接访问管理员界面，生产环境请设置为 false
 const router = useRouter();
 const active = ref(1);
 
@@ -117,7 +118,7 @@ const Content = (num) => {
 
 /* 页面加载时检查登录状态 */
 onMounted(() => {
-  if (!isLoggedIn()) {
+  if (!isLoggedIn() && !isdebug()) {
     router.push("/");
   }
 });

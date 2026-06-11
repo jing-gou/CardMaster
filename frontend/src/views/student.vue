@@ -119,6 +119,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { isLoggedIn, getCardid, getStudentInfo, endSession } from "../api/login.js";
 
+const isdebug = true; // 开发阶段允许直接访问学生界面，生产环境请设置为 false
 const router = useRouter();
 const active = ref(1);
 const cardid = ref("");
@@ -137,7 +138,7 @@ const userData = ref({
 
 /* 页面加载时检查登录状态 */
 onMounted(async () => {
-  if (!isLoggedIn()) {
+  if (!isLoggedIn() && !isdebug()) {
     router.push("/");
     return;
   }
