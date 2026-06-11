@@ -84,7 +84,7 @@ int edit_student_info(char *cardid, char *name, char *stuid);
 double find_income(void);
 
 // student.c
-int get_student_info(char *cardid, User *user);
+int get_student_info(char *cardid, User *user, Record *last_record);
 int change_password(char *cardid, char *old_password, char *new_password);
 int start_session(char *cardid, char *address);
 int end_session(char *cardid);

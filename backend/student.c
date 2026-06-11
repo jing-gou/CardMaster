@@ -1,14 +1,15 @@
 #include "common.h"
 
-/* get_student_info: 学生查询自己的信息
+/* get_student_info: 学生查询自己的信息（含最近上机记录）
  * 参数:
  *   cardid - 卡号
  *   user - 输出参数，查到的用户信息
+ *   last_record - 输出参数，最近一条上机记录
  * 返回:
  *   0 查询成功
  *  -1 用户不存在
  */
-int get_student_info(char *cardid, User *user){
+int get_student_info(char *cardid, User *user, Record *last_record){
     User users[MAX_USERS];
     int user_count = 0;
     int i;
@@ -18,6 +19,16 @@ int get_student_info(char *cardid, User *user){
     for(i = 0; i < user_count; i++){
         if(strcmp(users[i].cardid, cardid) == 0){
             *user = users[i];
+
+            /* 读取最近一条上机记录 */
+            Record records[MAX_RECORDS];
+            int record_count = 0;
+            load_records(cardid, records, &record_count);
+            if(record_count > 0){
+                *last_record = records[record_count - 1];
+            } else {
+                memset(last_record, 0, sizeof(Record));
+            }
             return 0;
         }
     }
