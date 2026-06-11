@@ -2,7 +2,12 @@
 
 static int login_attempts[MAX_USERS] = {0};
 
-
+/* user_login: 登录认证
+ * 参数:
+ *   cardid - 学号
+ *   password - 密码
+ *   role - 用户角色 0user 1admin
+ */
 LoginResult user_login(char *cardid, char *password, int *role){
     User users[MAX_USERS];     
     int user_count = 0;        
