@@ -33,7 +33,6 @@
   margin-top: -100px;
   width: 450px;
   height: 550px;
-  /* background-color: rgb(17, 85, 145); */
   display: flex;
   flex-direction: column;
   border-radius: 20px;
@@ -44,7 +43,7 @@
   background: linear-gradient(45deg, #0779e3d3 50%, #dde1ea 50%);
   background-size: 200% 200%;
   /* 斜向流动动画 */
-  animation: appleSlopeFlow 7s linear infinite;
+  animation: appleSlopeFlow 11s linear infinite;
   overflow: hidden;
 }
 
@@ -53,8 +52,11 @@
   0% {
     background-position: 0 0;
   }
-  100% {
+  50% {
     background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0 0;
   }
 }
 .login-title {
@@ -65,6 +67,9 @@
   margin-bottom: 40px;
 }
 
+h2 {
+  color: rgb(56 50 85);
+}
 .userName,
 .userPassword {
   display: flex;
