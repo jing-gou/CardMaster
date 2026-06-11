@@ -1,6 +1,6 @@
 # TODO List
 
-- [ ] common.h
+- [x] common.h
 - [ ] data.c
 - [ ] auth.c
 - [ ] student.c

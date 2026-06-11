@@ -8,7 +8,7 @@
 
 ## 项目框架
 ```
-CampusCard_Web/
+CardMaster/
 |
 ├── frontend/                 # Web 前端目录
 │   ├── index.html            # 登录页面
