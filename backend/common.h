@@ -1,0 +1,59 @@
+#ifndef common_h
+#define common_h
+
+#include "mongoose.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+// 结构体定义
+typedef enum {card_active = 0, card_lost = 1, card_frozen = 2} cardstatus;
+typedef enum {
+    LOGIN_SUCCESS = 0,      // 登录成功
+    LOGIN_WRONG_PWD = 1,    // 密码错误
+    LOGIN_NOT_FOUND = 2,    // 用户不存在
+    LOGIN_FROZEN = 3        // 账户已冻结
+} LoginResult;
+
+
+ typedef struct{
+    char cardid[10];
+    char name[15];
+    char stuid[15];
+    char password[20];
+    double balance;
+    double chargeamount;
+    cardstatus status;
+    int role;               /* 0=学生，1=管理员 */
+} User;
+
+typedef struct{
+    char cardid[10];
+    char time[15];
+    char date[20];
+    int duration;
+    int isOnline;
+    char address[10];
+} Record;
+
+// 常量定义
+#define MAX_USERS 100
+#define MAX_RECORDS 1000
+#define record_dir "data/records/"
+#define DATA_FILE "data/cards.dat"
+
+// 函数声明
+
+// data.c
+void load_users(User users[], int *user_count);
+void save_users(User users[], int user_count);
+void load_records(char *stuid, Record records[], int *record_count);
+void save_records(char *stuid, const Record *REC);
+
+// auth.c
+LoginResult user_login(char *cardid, char *password, int *role);
+
+
+
+#endif // common_h
