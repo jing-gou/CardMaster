@@ -10,12 +10,12 @@
  *   ev_data - 事件数据
  *   fn_data - 用户数据（未使用）
  */
-static void ev_handler(struct mg_connection *c, int ev, void *ev_data, void *fn_data){
+static void ev_handler(struct mg_connection *c, int ev, void *ev_data){
     if(ev == MG_EV_HTTP_MSG){
         struct mg_http_message *hm = (struct mg_http_message *)ev_data;
 
         /* 路由：API 接口（交给 api.c 处理） */
-        if(mg_match(hm->uri, mg_str("/api/"), NULL)){
+        if(strncmp(hm->uri.buf, "/api/", 5) == 0){
             handle_api(c, hm);
         }
         /* 路由：静态文件（前端页面） */
