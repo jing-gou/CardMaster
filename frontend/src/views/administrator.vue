@@ -64,6 +64,7 @@
   line-height: 50px;
   text-align: center;
   margin-top: 40px;
+  transition: font-size 0.3s ease;
 }
 .information {
   grid-column: 2 / 3;
@@ -73,6 +74,7 @@
   width: 180px;
   border-radius: 20px;
   background-color: #ccc;
+  font-size: 20px;
   cursor: pointer;
 }
 </style>

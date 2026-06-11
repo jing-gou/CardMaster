@@ -49,6 +49,13 @@
   padding-left: 75px;
 }
 .safari {
+  margin-top: 90px;
+  height: 600px;
+  background-color: rgb(198, 207, 246);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 12px rgba(39, 39, 39, 0.15),
+    0 -4px 12px rgb(255, 252, 252);
   grid-column: 1/2;
   grid-row: 2 / 3;
   display: flex;
@@ -61,8 +68,25 @@
   line-height: 50px;
   text-align: center;
   margin-top: 20px;
+  transition: all 0.3s ease;
+}
+.item:hover {
+  width: 180px;
+  border-radius: 20px;
+  background-color: #ccc;
+  cursor: pointer;
+  font-size: 18px;
 }
 .information {
+  border-radius: 20px;
+  box-shadow:
+    0 4px 12px rgba(39, 39, 39, 0.15),
+    0 -4px 12px rgb(255, 252, 252);
+  background-color: rgb(198, 207, 246);
+  width: 1000px;
+  height: 600px;
+  margin-top: 90px;
+  margin-left: 100px;
   grid-column: 2 / 3;
   grid-row: 2 / 3;
 }
