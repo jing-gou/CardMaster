@@ -25,7 +25,7 @@ typedef enum {
     double balance;
     double chargeamount;
     cardstatus status;
-    int role;               /* 0=学生，1=管理员 */
+    int role;               
 } User;
 
 typedef struct{
@@ -54,6 +54,10 @@ void save_records(char *stuid, const Record *REC);
 // auth.c
 LoginResult user_login(char *cardid, char *password, int *role);
 
+// api.c
+void handle_api(struct mg_connection *c, struct mg_http_message *hm);
 
+// admin.c
+int create_student(char *cardid, char *name, char *stuid, char *password);
 
 #endif // common_h
