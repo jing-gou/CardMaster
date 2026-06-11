@@ -37,9 +37,19 @@ typedef struct{
     char address[10];
 } Record;
 
+// Token 结构
+typedef struct{
+    char token[64];         /* token 字符串 */
+    char cardid[20];        /* 对应的卡号 */
+    int role;               /* 角色 */
+    time_t expire;          /* 过期时间 */
+} Token;
+
 // 常量定义
 #define MAX_USERS 100
 #define MAX_RECORDS 1000
+#define MAX_TOKENS 100
+#define TOKEN_EXPIRE 3600   /* token 有效期（秒） */
 #define record_dir "data/records/"
 #define DATA_FILE "data/cards.txt"
 
@@ -54,8 +64,9 @@ void save_records(char *stuid, const Record *REC);
 int delete_user(char *cardid);
 
 // auth.c
-
 LoginResult user_login(char *cardid, char *password, int *role);
+char* generate_token(char *cardid, int role);
+int verify_token(char *token, char *cardid, int *role);
 
 // api.c
 
