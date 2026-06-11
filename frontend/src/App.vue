@@ -1,7 +1,7 @@
 <template>
   <!-- 显示登录页面 -->
 
-  <Login />
+  <Admin />
 </template>
 
 <script setup>
