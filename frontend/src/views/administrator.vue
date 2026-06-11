@@ -30,6 +30,7 @@
   background-color: rgb(247, 243, 243);
 }
 .header {
+  line-height: 80px;
   color: rgb(27 24 42);
   grid-column: 1/-1;
   background: linear-gradient(
@@ -67,6 +68,15 @@
   transition: font-size 0.3s ease;
 }
 .information {
+  width: 1000px;
+  height: 600px;
+  margin-top: 100px;
+  margin-left: 100px;
+  background-color: rgb(245, 238, 238);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 12px rgba(39, 39, 39, 0.15),
+    0 -4px 12px rgb(255, 252, 252);
   grid-column: 2 / 3;
   grid-row: 2 / 3;
 }

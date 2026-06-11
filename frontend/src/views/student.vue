@@ -38,6 +38,7 @@
   background: linear-gradient(135deg, rgb(225, 225, 239) 50%, rgb(66, 75, 143));
 }
 .header {
+  line-height: 80px;
   grid-column: 1/-1;
   background: linear-gradient(
     135deg,
@@ -78,9 +79,10 @@
   font-size: 18px;
 }
 .information {
+  /* line-height: 80px; */
   border-radius: 20px;
   box-shadow:
-    0 4px 12px rgba(39, 39, 39, 0.15),
+    0 4px 12px rgba(67, 44, 44, 0.15),
     0 -4px 12px rgb(255, 252, 252);
   background-color: rgb(198, 207, 246);
   width: 1000px;
