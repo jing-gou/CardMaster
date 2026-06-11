@@ -2,14 +2,12 @@
   <div class="wrap">
     <div class="header">管理员系统</div>
     <div class="safari">
-      <div class="item1 item" @click="Content(1)">充值</div>
-      <div class="item2 item" @click="Content(2)">挂失</div>
-      <div class="item3 item" @click="Content(3)">重置学生密码</div>
+      <div class="item1 item" @click="Content(1)">学生管理</div>
+      <div class="item2 item" @click="Content(2)">收入情况</div>
+      <div class="item3 item" @click="Content(3)">系统设置</div>
     </div>
     <main class="information">
-      <div v-if="active === 1">
-        <p>充值功能</p>
-      </div>
+      <div v-if="active === 1">1hao</div>
       <div v-if="active === 2">
         <p>挂失功能</p>
       </div>
@@ -40,6 +38,7 @@
   font-size: 35px;
   font-weight: 400;
   padding-left: 75px;
+  line-height: 100px;
 }
 .safari {
   margin-top: 150px;
@@ -66,6 +65,15 @@
   margin-top: 40px;
 }
 .information {
+  margin-top: 80px;
+  margin-left: 100px;
+  background-color: rgb(245, 238, 238);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 12px rgba(39, 39, 39, 0.15),
+    0 -4px 12px rgb(255, 252, 252);
+  width: 1000px;
+  height: 600px;
   grid-column: 2 / 3;
   grid-row: 2 / 3;
 }
@@ -74,6 +82,8 @@
   border-radius: 20px;
   background-color: #ccc;
   cursor: pointer;
+  transition: font-size 0.5s ease;
+  font-size: 20px;
 }
 </style>
 
