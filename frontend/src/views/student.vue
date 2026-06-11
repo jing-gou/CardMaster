@@ -5,7 +5,7 @@
       <div class="item1 item" @click="Content(1)">账户信息</div>
       <div class="item2 item" @click="Content(2)">上机日志</div>
       <div class="item3 item" @click="Content(3)">账户充值</div>
-      <div class="item4 item" @click="Content(4)"></div>
+      <div class="item4 item" @click="Content(4)">按钮4</div>
       <div class="item5 item" @click="Content(5)">按钮5</div>
     </div>
     <main class="information">
@@ -20,8 +20,8 @@
 
         <p>上机地点{{ userData.onAddress }}</p>
       </div>
-      <div v-if="active === 2">内容区域 2：消费记录</div>
-      <div v-if="active === 3">内容区域 3：系统设置</div>
+      <div v-if="active === 2">内容区域 2：上机日志</div>
+      <div v-if="active === 3">内容区域 3：账户充值</div>
       <div v-if="active === 4">内容区域 4：系统设置</div>
       <div v-if="active === 5">内容区域 5：系统设置</div>
     </main>
