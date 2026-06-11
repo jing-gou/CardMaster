@@ -41,7 +41,7 @@ typedef struct{
 #define MAX_USERS 100
 #define MAX_RECORDS 1000
 #define record_dir "data/records/"
-#define DATA_FILE "data/cards.dat"
+#define DATA_FILE "data/cards.txt"
 
 // 函数声明
 

@@ -1,13 +1,22 @@
 #include "common.h"
+#include <stdarg.h>
 
-/* send_json: 发送 JSON 响应
+/* send_json: 发送 JSON 响应（支持格式化）
  * 参数:
  *   c - 连接对象
  *   code - HTTP 状态码
- *   json - JSON 字符串
+ *   fmt - 格式化字符串
+ *   ... - 可变参数
  */
-static void send_json(struct mg_connection *c, int code, const char *json){
-    mg_http_reply(c, code, "Content-Type: application/json\r\n", "%s", json);
+static void send_json(struct mg_connection *c, int code, const char *fmt, ...){
+    char buf[512];              /* 响应缓冲区 */
+    va_list ap;                 /* 可变参数列表 */
+
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+
+    mg_http_reply(c, code, "Content-Type: application/json\r\n", "%s", buf);
 }
 
 /* handle_login: 处理登录请求
@@ -87,11 +96,11 @@ static void handle_create_student(struct mg_connection *c, struct mg_http_messag
  */
 void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 登录接口 */
-    if(mg_match(hm->uri, mg_str("/api/login"), NULL)){
+    if(strncmp(hm->uri.buf, "/api/login", 10) == 0){
         handle_login(c, hm);
     }
     /* 管理员：创建学生接口 */
-    else if(mg_match(hm->uri, mg_str("/api/admin/create_student"), NULL)){
+    else if(strncmp(hm->uri.buf, "/api/admin/create_student", 25) == 0){
         handle_create_student(c, hm);
     }
     /* 未匹配的接口 */

@@ -1,23 +1,46 @@
 #include "common.h"
 
 void load_users(User users[], int *user_count){
-    FILE *fp = fopen(DATA_FILE, "rb");
+    FILE *fp = fopen(DATA_FILE, "r");
     if (fp == NULL) {
         printf("[WARN]无法打开数据文件\n");
         *user_count = 0;
         return;
     }
-    *user_count = fread(users, sizeof(User), MAX_USERS, fp);
+    *user_count = 0;
+    while (*user_count < MAX_USERS &&
+           fscanf(fp, "%s %s %s %s %lf %lf %d %d",
+                  users[*user_count].cardid,
+                  users[*user_count].name,
+                  users[*user_count].stuid,
+                  users[*user_count].password,
+                  &users[*user_count].balance,
+                  &users[*user_count].chargeamount,
+                  (int *)&users[*user_count].status,
+                  &users[*user_count].role) == 8) {
+        (*user_count)++;
+    }
     fclose(fp);
 }
 
 void save_users(User users[], int user_count){
-    FILE *fp = fopen(DATA_FILE, "wb");
+    FILE *fp = fopen(DATA_FILE, "w");
     if (fp == NULL) {
         printf("[WARN]无法打开数据文件\n");
         return;
     }
-    fwrite(users, sizeof(User), user_count, fp);
+    int i;
+    for(i = 0; i < user_count; i++){
+        fprintf(fp, "%s %s %s %s %.2f %.2f %d %d\n",
+                users[i].cardid,
+                users[i].name,
+                users[i].stuid,
+                users[i].password,
+                users[i].balance,
+                users[i].chargeamount,
+                (int)users[i].status,
+                users[i].role);
+    }
     fclose(fp);
 }
 
