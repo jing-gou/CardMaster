@@ -27,32 +27,43 @@
   grid-template-columns: 220px 1fr;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, rgb(225, 225, 239) 50%, rgb(66, 75, 143));
+  background-color: rgb(247, 243, 243);
 }
 .header {
+  color: rgb(27 24 42);
   grid-column: 1/-1;
   background: linear-gradient(
     135deg,
-    rgb(198, 207, 246) 70%,
-    rgb(138, 146, 206) 50%
+    rgb(249, 243, 243) 70%,
+    rgb(199, 193, 193) 50%
   );
   font-size: 35px;
   font-weight: 400;
   padding-left: 75px;
 }
 .safari {
+  margin-top: 150px;
+  height: 400px;
   grid-column: 1/2;
   grid-row: 2 / 3;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: rgb(245, 238, 238);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 12px rgba(39, 39, 39, 0.15),
+    0 -4px 12px rgb(255, 252, 252);
 }
 .item {
+  font-size: 18px;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
+  color: rgb(27 24 42);
   width: 220px;
   height: 50px;
   line-height: 50px;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 .information {
   grid-column: 2 / 3;
