@@ -1,7 +1,7 @@
 #include "common.h"
 #ifdef _WIN32
   #include <direct.h>
-  #define MKDIR(path) MKDIR(path)
+  #define MKDIR(path) _mkdir(path)
 #else
   #include <sys/stat.h>
   #define MKDIR(path) mkdir(path, 0755)
@@ -338,7 +338,7 @@ double find_income(void){
 int get_all_students(User students[], int *student_count, int online_flags[]){
     User users[MAX_USERS];
     int user_count = 0;
-    int i, j;
+    int i;
 
     load_users(users, &user_count);
 

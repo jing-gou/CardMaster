@@ -70,7 +70,7 @@ char* generate_token(char *cardid, int role){
 
     /* 生成简单 token: cardid + 时间戳 */
     Token new_token;
-    snprintf(new_token.token, sizeof(new_token.token), "%s_%ld_%d", cardid, now, rand() % 10000);
+    snprintf(new_token.token, sizeof(new_token.token), "%s_%lld_%d", cardid, (long long)now, rand() % 10000);
     strncpy(new_token.cardid, cardid, sizeof(new_token.cardid) - 1);
     new_token.role = role;
     new_token.expire = now + TOKEN_EXPIRE;
