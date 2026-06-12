@@ -3,6 +3,7 @@ name: Build Backend
 on:
   push:
     branches: [main, demo]
+    tags: ['v*']
     paths:
       - 'backend/**'
   pull_request:
@@ -19,8 +20,6 @@ jobs:
 
       - name: Install MinGW
         uses: bwoodsend/setup-winlibs-action@v1
-        with:
-          with-gcc: true
 
       - name: Build
         shell: bash
@@ -51,3 +50,29 @@ jobs:
         with:
           name: cardmaster-macos
           path: backend/server
+
+  release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare assets
+        run: |
+          mkdir -p release
+          cp artifacts/cardmaster-windows/server.exe release/server-windows.exe
+          cp artifacts/cardmaster-macos/server release/server-macos
+          chmod +x release/server-macos
+          ls -lh release/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release/*

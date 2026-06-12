@@ -1,5 +1,11 @@
 #include "common.h"
-#include <direct.h>
+#ifdef _WIN32
+  #include <direct.h>
+  #define MKDIR(path) _mkdir(path)
+#else
+  #include <sys/stat.h>
+  #define MKDIR(path) mkdir(path, 0755)
+#endif
 
 /* create_student: 管理员创建新学生
  * 参数:
@@ -18,8 +24,8 @@ int create_student(char *cardid, char *name, char *stuid, char *password){
     int i;                      /* 循环变量 */
 
     /* 确保数据目录存在 */
-    _mkdir("data");
-    _mkdir("data/records");
+    MKDIR("data");
+    MKDIR("data/records");
 
     /* 加载现有用户 */
     load_users(users, &user_count);
@@ -99,7 +105,7 @@ int recharge(char *cardid, double amount){
             save_users(users, user_count);
 
             /* 追加充值记录到 recharges.txt */
-            _mkdir("data");
+            MKDIR("data");
             {
                 FILE *rfp = fopen(RECHARGE_FILE, "a");
                 if(rfp != NULL){
@@ -332,7 +338,7 @@ double find_income(void){
 int get_all_students(User students[], int *student_count, int online_flags[]){
     User users[MAX_USERS];
     int user_count = 0;
-    int i, j;
+    int i;
 
     load_users(users, &user_count);
 
