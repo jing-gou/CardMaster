@@ -1,7 +1,8 @@
 <template>
   <div class="containfather">
     <div class="loginBox">
-      <h2 class="login-title">校园卡系统</h2>
+      <h1 class="login-title">CardMaster</h1>
+
       <div class="userName">
         <input
           type="text"
@@ -10,6 +11,7 @@
           v-model="cardid"
         />
       </div>
+
       <div class="userPassword">
         <input
           type="password"
@@ -18,9 +20,14 @@
           v-model="password"
         />
       </div>
-      <button class="login-button" id="login-button" @click="handleLogin">
+
+      <button 
+        class="login-button" 
+        id="login-button" 
+        @click="handleLogin">
         登录
       </button>
+
       <p class="error-msg" v-if="errMsg">{{ errMsg }}</p>
     </div>
   </div>
@@ -129,6 +136,7 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   margin-bottom: 24px;
+  border-radius: 25px;
 }
 .userName input,
 .userPassword input {

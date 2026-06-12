@@ -37,6 +37,13 @@ typedef struct{
     char address[10];
 } Record;
 
+typedef struct{
+    char cardid[10];
+    double amount;
+    char date[20];
+    char time[15];
+} RechargeRecord;
+
 // Token 结构
 typedef struct{
     char token[64];         /* token 字符串 */
@@ -52,6 +59,7 @@ typedef struct{
 #define TOKEN_EXPIRE 3600   /* token 有效期（秒） */
 #define record_dir "data/records/"
 #define DATA_FILE "data/cards.txt"
+#define RECHARGE_FILE "data/recharges.txt"
 
 // 函数声明
 
@@ -82,6 +90,9 @@ int delete_student(char *cardid);
 int search_student_info(char *cardid, User *user);
 int edit_student_info(char *cardid, char *name, char *stuid);
 double find_income(void);
+int get_all_students(User students[], int *student_count, int online_flags[]);
+int get_all_recharge_records(RechargeRecord records[], int *record_count);
+void get_income_stats(double *total, double *monthly, double *daily);
 
 // student.c
 int get_student_info(char *cardid, User *user, Record *last_record);

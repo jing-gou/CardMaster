@@ -1,18 +1,17 @@
 <template>
   <div class="wrap">
     <div class="header">
-      CardMaster 学生端
-      <button class="logout-btn" @click="handleLogout">下机</button>
+      CardMaster 管理端
+      <button class="logout-btn" @click="handleLogout">登出</button>
     </div>
     <div class="safari">
-      <div class="item" :class="{ active: active === 1 }" @click="Content(1)">账户信息</div>
-      <div class="item" :class="{ active: active === 2 }" @click="Content(2)">上机日志</div>
-      <div class="item" :class="{ active: active === 3 }" @click="Content(3)">修改密码</div>
+      <div class="item" :class="{ active: active === 1 }" @click="Content(1)">用户管理</div>
+      <div class="item" :class="{ active: active === 2 }" @click="Content(2)">收入统计</div>
     </div>
     <main class="information">
       <!-- 账户信息 -->
       <div v-if="active === 1" class="info-card">
-        <h3>个人信息</h3>
+        <h3>学生列表</h3> 
         <div class="info-row">
           <span class="label">卡号</span>
           <span class="value">{{ userData.cardid }}</span>

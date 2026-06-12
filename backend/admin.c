@@ -97,6 +97,24 @@ int recharge(char *cardid, double amount){
 
             /* 保存到文件 */
             save_users(users, user_count);
+
+            /* 追加充值记录到 recharges.txt */
+            _mkdir("data");
+            {
+                FILE *rfp = fopen(RECHARGE_FILE, "a");
+                if(rfp != NULL){
+                    time_t now;
+                    struct tm *t;
+                    time(&now);
+                    t = localtime(&now);
+                    fprintf(rfp, "%s %.2f %04d-%02d-%02d %02d:%02d:%02d\n",
+                            cardid, amount,
+                            t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+                            t->tm_hour, t->tm_min, t->tm_sec);
+                    fclose(rfp);
+                }
+            }
+
             return 0;  /* 充值成功 */
         }
     }
@@ -260,4 +278,114 @@ double find_income(void){
         }
     }
     return total;
+}
+
+/* get_all_students: 获取所有学生信息（含在线状态）
+ * 参数:
+ *   students - 输出：学生数组
+ *   student_count - 输出：学生数量
+ *   online_flags - 输出：在线状态数组
+ * 返回:
+ *   0 成功
+ */
+int get_all_students(User students[], int *student_count, int online_flags[]){
+    User users[MAX_USERS];
+    int user_count = 0;
+    int i, j;
+
+    load_users(users, &user_count);
+
+    *student_count = 0;
+    for(i = 0; i < user_count; i++){
+        if(users[i].role == 0){
+            students[*student_count] = users[i];
+
+            /* 检查在线状态：加载该学生的记录，看最后一条的 isOnline */
+            Record records[MAX_RECORDS];
+            int record_count = 0;
+            load_records(users[i].stuid, records, &record_count);
+
+            online_flags[*student_count] = 0;
+            if(record_count > 0){
+                online_flags[*student_count] = records[record_count - 1].isOnline;
+            }
+
+            (*student_count)++;
+        }
+    }
+    return 0;
+}
+
+/* get_all_recharge_records: 获取所有充值记录
+ * 参数:
+ *   records - 输出：充值记录数组
+ *   record_count - 输出：记录数量
+ * 返回:
+ *   0 成功
+ *  -1 文件打开失败
+ */
+int get_all_recharge_records(RechargeRecord records[], int *record_count){
+    FILE *fp;
+    *record_count = 0;
+
+    fp = fopen(RECHARGE_FILE, "r");
+    if(fp == NULL){
+        return -1;
+    }
+
+    while(*record_count < MAX_RECORDS){
+        if(fscanf(fp, "%9s %lf %19s %14s",
+                  records[*record_count].cardid,
+                  &records[*record_count].amount,
+                  records[*record_count].date,
+                  records[*record_count].time) == 4){
+            (*record_count)++;
+        } else {
+            break;
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
+/* get_income_stats: 获取收入统计（总额、本月、今日）
+ * 参数:
+ *   total - 输出：累计收入
+ *   monthly - 输出：本月收入
+ *   daily - 输出：今日收入
+ */
+void get_income_stats(double *total, double *monthly, double *daily){
+    RechargeRecord records[MAX_RECORDS];
+    int record_count = 0;
+    int i;
+    time_t now;
+    struct tm *t;
+    char today[20];
+    char month_str[8];
+
+    *total = 0;
+    *monthly = 0;
+    *daily = 0;
+
+    time(&now);
+    t = localtime(&now);
+    snprintf(today, sizeof(today), "%04d-%02d-%02d",
+             t->tm_year + 1900, t->tm_mon + 1, t->tm_mday);
+    snprintf(month_str, sizeof(month_str), "%04d-%02d",
+             t->tm_year + 1900, t->tm_mon + 1);
+
+    if(get_all_recharge_records(records, &record_count) != 0){
+        return;
+    }
+
+    for(i = 0; i < record_count; i++){
+        *total += records[i].amount;
+        if(strncmp(records[i].date, month_str, 7) == 0){
+            *monthly += records[i].amount;
+        }
+        if(strncmp(records[i].date, today, 10) == 0){
+            *daily += records[i].amount;
+        }
+    }
 }

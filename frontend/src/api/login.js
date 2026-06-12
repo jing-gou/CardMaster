@@ -242,3 +242,67 @@ export async function getRecords(cardid) {
   })
   return await resp.json()
 }
+
+/**
+ * 管理员统计收入
+ * @returns {Promise<{code: number, total: number}>}
+ */
+export async function findIncome() {
+  const resp = await fetch('/api/admin/find_income', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}
+
+/**
+ * 删除学生
+ * @param {string} cardid - 卡号
+ * @returns {Promise<{code: number, message: string}>}
+ */
+export async function deleteStudent(cardid) {
+  const body = 'cardid=' + encodeURIComponent(cardid)
+
+  const resp = await fetch('/api/admin/delete_student', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+/**
+ * 获取所有学生列表（含在线状态）
+ * @returns {Promise<{code: number, students: Array}>}
+ */
+export async function getAllStudents() {
+  const resp = await fetch('/api/admin/get_students', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}
+
+/**
+ * 获取所有充值记录
+ * @returns {Promise<{code: number, records: Array}>}
+ */
+export async function getRechargeRecords() {
+  const resp = await fetch('/api/admin/get_recharge_records', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}
+
+/**
+ * 获取收入统计
+ * @returns {Promise<{code: number, total: number, monthly: number, daily: number}>}
+ */
+export async function getIncomeStats() {
+  const resp = await fetch('/api/admin/get_income_stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}

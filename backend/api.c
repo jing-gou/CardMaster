@@ -247,6 +247,66 @@ static void handle_find_income(struct mg_connection *c, struct mg_http_message *
     send_json(c, 200, "{\"code\":0,\"total\":%.2f}", total);
 }
 
+/* handle_get_students: 处理获取所有学生列表请求 */
+static void handle_get_students(struct mg_connection *c, struct mg_http_message *hm){
+    User students[MAX_USERS];
+    int student_count = 0;
+    int online_flags[MAX_USERS] = {0};
+    int i;
+
+    get_all_students(students, &student_count, online_flags);
+
+    char buf[16384] = "{\"code\":0,\"students\":[";
+    for(i = 0; i < student_count; i++){
+        if(i > 0) strcat(buf, ",");
+        char item[256];
+        snprintf(item, sizeof(item),
+            "{\"cardid\":\"%s\",\"name\":\"%s\",\"stuid\":\"%s\",\"balance\":%.2f,\"status\":%d,\"isOnline\":%d}",
+            students[i].cardid, students[i].name, students[i].stuid,
+            students[i].balance, (int)students[i].status, online_flags[i]);
+        strcat(buf, item);
+    }
+    strcat(buf, "]}");
+
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", buf);
+}
+
+/* handle_get_recharge_records: 处理获取充值记录请求 */
+static void handle_get_recharge_records(struct mg_connection *c, struct mg_http_message *hm){
+    RechargeRecord records[MAX_RECORDS];
+    int record_count = 0;
+    int i;
+
+    get_all_recharge_records(records, &record_count);
+
+    char *buf = malloc(MAX_RECORDS * 120 + 64);
+    if(buf == NULL){
+        send_json(c, 500, "{\"code\":-1,\"message\":\"服务器内存不足\"}");
+        return;
+    }
+    strcpy(buf, "{\"code\":0,\"records\":[");
+
+    for(i = 0; i < record_count; i++){
+        if(i > 0) strcat(buf, ",");
+        char item[256];
+        snprintf(item, sizeof(item),
+            "{\"cardid\":\"%s\",\"amount\":%.2f,\"date\":\"%s\",\"time\":\"%s\"}",
+            records[i].cardid, records[i].amount, records[i].date, records[i].time);
+        strcat(buf, item);
+    }
+    strcat(buf, "]}");
+
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", buf);
+    free(buf);
+}
+
+/* handle_get_income_stats: 处理获取收入统计请求 */
+static void handle_get_income_stats(struct mg_connection *c, struct mg_http_message *hm){
+    double total = 0, monthly = 0, daily = 0;
+    get_income_stats(&total, &monthly, &daily);
+    send_json(c, 200, "{\"code\":0,\"total\":%.2f,\"monthly\":%.2f,\"daily\":%.2f}", total, monthly, daily);
+}
+
 /* handle_get_student_info: 处理学生查询自己信息请求 */
 static void handle_get_student_info(struct mg_connection *c, struct mg_http_message *hm){
     char cardid[20] = {0};
@@ -377,6 +437,18 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 管理员：统计收入接口 */
     else if(strncmp(hm->uri.buf, "/api/admin/find_income", 22) == 0){
         handle_find_income(c, hm);
+    }
+    /* 管理员：获取所有学生列表 */
+    else if(strncmp(hm->uri.buf, "/api/admin/get_students", 23) == 0){
+        handle_get_students(c, hm);
+    }
+    /* 管理员：获取充值记录 */
+    else if(strncmp(hm->uri.buf, "/api/admin/get_recharge_records", 31) == 0){
+        handle_get_recharge_records(c, hm);
+    }
+    /* 管理员：获取收入统计 */
+    else if(strncmp(hm->uri.buf, "/api/admin/get_income_stats", 27) == 0){
+        handle_get_income_stats(c, hm);
     }
     /* 学生：查询自己信息接口 */
     else if(strncmp(hm->uri.buf, "/api/student/info", 17) == 0){
