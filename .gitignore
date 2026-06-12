@@ -23,3 +23,9 @@ build/
 cmake-build-*/
 CMakeFiles/
 CMakeCache.txt
+
+# 数据文件
+backend/data/cards.txt
+backend/data/recharges.txt
+backend/data/records/*.txt
+!backend/data/records/.gitkeep

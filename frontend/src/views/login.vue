@@ -3,7 +3,8 @@
     <div class="loginBox">
       <h1 class="login-title">CardMaster</h1>
 
-      <div class="userName">
+      <div class="form-group ">
+        <span class="material-symbols-rounded icon-prefix">account_circle</span>
         <input
           type="text"
           id="username"
@@ -13,6 +14,7 @@
       </div>
 
       <div class="userPassword">
+        <span class="material-symbols-rounded icon-prefix">lock</span>
         <input
           type="password"
           id="password"
@@ -88,6 +90,50 @@ const handleLogin = async () => {
   font-family: "Microsoft YaHei", sans-serif;
 }
 
+.material-symbols-rounded {
+  font-family: "Material Symbols Rounded" !important;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.form-group input {
+  width: 320px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(138, 146, 206, 0.5);
+  padding: 0 18px 0 44px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.form-group input:focus {
+  border-color: rgb(66, 75, 143);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(66, 75, 143, 0.1);
+}
+
+.form-group input::placeholder {
+  color: rgb(150, 150, 150);
+}
+
+.form-group .icon-prefix {
+  position: absolute;
+  left: calc(50% - 160px + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(117, 116, 116);
+  pointer-events: none;
+  font-size: 20px;
+}
+
+
 .containfather {
   width: 100%;
   height: 100vh;
@@ -131,21 +177,43 @@ const handleLogin = async () => {
   margin-bottom: 40px;
 }
 
-.userName,
 .userPassword {
+  position: relative;
   display: flex;
   justify-content: center;
   margin-bottom: 24px;
-  border-radius: 25px;
 }
-.userName input,
+
 .userPassword input {
-  width: 75%;
+  width: 320px;
   height: 48px;
-  border: 1px solid rgb(74, 74, 74);
-  padding: 0 12px;
-  border-radius: 5px;
-  box-shadow: 0 0 12px 1px rgba(117, 116, 116, 0.15);
+  border-radius: 12px;
+  border: 1px solid rgba(138, 146, 206, 0.5);
+  padding: 0 18px 0 44px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.userPassword input:focus {
+  border-color: rgb(66, 75, 143);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(66, 75, 143, 0.1);
+}
+
+.userPassword input::placeholder {
+  color: rgb(150, 150, 150);
+}
+
+.userPassword .icon-prefix {
+  position: absolute;
+  left: calc(50% - 160px + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(117, 116, 116);
+  pointer-events: none;
+  font-size: 20px;
 }
 
 button {
@@ -154,7 +222,7 @@ button {
   border: 1px solid rgb(193, 191, 191);
   border-radius: 20px;
   margin: 0 auto;
-  background-color: rgb(214, 211, 211);
+  background-color: rgb(214, 211, 211, 0.7);
   transition: all 0.3s ease;
   cursor: pointer;
   font-size: 16px;
