@@ -46,6 +46,7 @@
                 <button class="action-btn" @click="openModal('recharge', s)">充值</button>
                 <button class="action-btn" @click="openModal('resetPwd', s)">重置密码</button>
                 <button class="action-btn warn" @click="openModal('reportLost', s)">挂失</button>
+                <button class="action-btn success" @click="openModal('releaseLost', s)">解除挂失</button>
                 <button class="action-btn danger" @click="openModal('delete', s)">删除</button>
               </td>
             </tr>
@@ -111,6 +112,7 @@
         <h3 v-else-if="modalType === 'recharge'">充值 - {{ selectedStudent?.name }}</h3>
         <h3 v-else-if="modalType === 'resetPwd'">重置密码 - {{ selectedStudent?.name }}</h3>
         <h3 v-else-if="modalType === 'reportLost'">挂失确认</h3>
+        <h3 v-else-if="modalType === 'releaseLost'">解除挂失确认</h3>
         <h3 v-else-if="modalType === 'delete'">删除确认</h3>
 
         <div v-if="modalType === 'create'">
@@ -134,7 +136,10 @@
         </div>
 
         <p v-if="modalType === 'reportLost'" class="confirm-text">
-          确定要挂失 <strong>{{ selectedStudent?.name }}</strong> 的卡吗？
+          确定要 {{ selectedStudent?.status === 1 ? '解除挂失' : '挂失' }} <strong>{{ selectedStudent?.name }}</strong> 的卡吗？
+        </p>
+        <p v-if="modalType === 'releaseLost'" class="confirm-text">
+          确定要解除挂失 <strong>{{ selectedStudent?.name }}</strong> 的卡吗？
         </p>
         <p v-if="modalType === 'delete'" class="confirm-text">
           确定要删除 <strong>{{ selectedStudent?.name }}</strong> 吗？此操作不可恢复。
@@ -155,7 +160,7 @@
 import { ref, computed, onMounted, nextTick } from "vue"
 import { useRouter } from "vue-router"
 import {
-  isLoggedIn, clearToken, createStudent, recharge, reportLost,
+  isLoggedIn, clearToken, createStudent, recharge, reportLost, releaseLost,
   resetPassword, deleteStudent,
   getAllStudents, getRechargeRecords, getIncomeStats
 } from "../api/login.js"
@@ -244,6 +249,9 @@ const handleModalSubmit = async () => {
         return
       }
       result = await resetPassword(s.cardid, modalNewPwd.value)
+      break
+    case 'releaseLost':
+      result = await releaseLost(s.cardid)
       break
     case 'reportLost':
       result = await reportLost(s.cardid)

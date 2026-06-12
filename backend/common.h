@@ -85,6 +85,7 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm);
 int create_student(char *cardid, char *name, char *stuid, char *password);
 int recharge(char *cardid, double amount);
 int report_lost(char *cardid);
+int release_lost(char *cardid);
 int reset_password(char *cardid, char *new_password);
 int delete_student(char *cardid);
 int search_student_info(char *cardid, User *user);

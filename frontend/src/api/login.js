@@ -158,6 +158,23 @@ export async function reportLost(cardid) {
 }
 
 /**
+ * 解除挂失
+ * @param {string} cardid - 卡号
+ * @returns {Promise<{code: number, message: string}>}
+ */
+export async function releaseLost(cardid) {
+  const body = 'cardid=' + encodeURIComponent(cardid)
+
+  const resp = await fetch('/api/admin/release_lost', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+
+/**
  * 重置密码
  * @param {string} cardid - 卡号
  * @param {string} newPassword - 新密码

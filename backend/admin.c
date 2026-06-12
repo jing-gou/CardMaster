@@ -162,6 +162,47 @@ int report_lost(char *cardid){
     return -1;  /* 用户不存在 */
 }
 
+/* release_lost: 管理员解除挂失学生卡
+ * 参数:
+ *   cardid - 卡号
+ * 返回:
+ *   0 解除挂失成功
+ *  -1 用户不存在
+ *  -2 用户未挂失
+ *  -3 用户已冻结
+ */
+int release_lost(char *cardid){
+    User users[MAX_USERS];      /* 用户数组 */
+    int user_count = 0;         /* 用户数量 */
+    int i;                      /* 循环变量 */
+
+    /* 加载所有用户 */
+    load_users(users, &user_count);
+
+    /* 遍历查找目标用户 */
+    for(i = 0; i < user_count; i++){
+        if(strcmp(users[i].cardid, cardid) == 0){
+            /* 找到用户，检查状态 */
+            if(users[i].status == card_active){
+                return -2;  /* 用户未挂失 */
+            }
+            if(users[i].status == card_frozen){
+                return -3;  /* 用户已冻结 */
+            }
+
+            /* 解除挂失 */
+            users[i].status = card_active;
+
+            /* 保存到文件 */
+            save_users(users, user_count);
+            return 0;  /* 解除挂失成功 */
+        }
+    }
+
+    return -1;  /* 用户不存在 */
+}
+
+
 /* reset_password: 管理员重置学生密码
  * 参数:
  *   cardid - 卡号

@@ -168,6 +168,38 @@ static void handle_report_lost(struct mg_connection *c, struct mg_http_message *
     }
 }
 
+/* handle_release_lost: 处理解除挂失请求
+ * 参数:
+ *   c - 连接对象
+ *   hm - HTTP 请求消息
+ */
+static void handle_release_lost(struct mg_connection *c, struct mg_http_message *hm){
+    char cardid[20] = {0};      /* 卡号 */
+    int result;                 /* 解除挂失结果 */
+
+    /* 从 POST 请求体解析参数 */
+    mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
+
+    /* 调用解除挂失函数 */
+    result = release_lost(cardid);
+
+    /* 根据结果返回 JSON */
+    switch(result){
+        case 0:
+            send_json(c, 200, "{\"code\":0,\"message\":\"解除挂失成功\"}");
+            break;
+        case -1:
+            send_json(c, 200, "{\"code\":-1,\"message\":\"用户不存在\"}");
+            break;
+        case -2:
+            send_json(c, 200, "{\"code\":-2,\"message\":\"用户未挂失\"}");
+            break;
+        case -3:
+            send_json(c, 200, "{\"code\":-3,\"message\":\"用户已冻结\"}");
+            break;
+    }
+}
+
 /* handle_reset_password: 处理重置密码请求
  * 参数:
  *   c - 连接对象
@@ -417,6 +449,10 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 管理员：挂失接口 */
     else if(strncmp(hm->uri.buf, "/api/admin/report_lost", 22) == 0){
         handle_report_lost(c, hm);
+    }
+    /* 管理员：解除挂失接口 */
+    else if(strncmp(hm->uri.buf, "/api/admin/release_lost", 22) == 0){
+        handle_release_lost(c, hm);
     }
     /* 管理员：重置密码接口 */
     else if(strncmp(hm->uri.buf, "/api/admin/reset_password", 25) == 0){
