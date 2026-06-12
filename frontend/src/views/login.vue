@@ -1,61 +1,85 @@
 <template>
   <div class="containfather">
     <div class="loginBox">
-      <h2 class="login-title">校园卡系统</h2>
-      <div class="userName">
-        <input type="text" id="username" placeholder="请输入卡号" v-model="cardid" />
+      <h1 class="login-title">CardMaster</h1>
+
+      <div class="form-group ">
+        <span class="material-symbols-rounded icon-prefix">account_circle</span>
+        <input
+          type="text"
+          id="username"
+          placeholder="请输入卡号"
+          v-model="cardid"
+        />
       </div>
+
       <div class="userPassword">
-        <input type="password" id="password" placeholder="请输入密码" v-model="password" />
+        <span class="material-symbols-rounded icon-prefix">lock</span>
+        <input
+          type="password"
+          id="password"
+          placeholder="请输入密码"
+          v-model="password"
+        />
       </div>
-      <button class="login-button" id="login-button" @click="handleLogin">登录</button>
+
+      <button 
+        class="login-button" 
+        id="login-button" 
+        @click="handleLogin">
+        登录
+      </button>
+
       <p class="error-msg" v-if="errMsg">{{ errMsg }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { login } from '../api/login.js'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { login, saveToken } from "../api/login.js";
 
-const router = useRouter()
-const cardid = ref('')
-const password = ref('')
-const errMsg = ref('')
+const router = useRouter();
+const cardid = ref("");
+const password = ref("");
+const errMsg = ref("");
 
 /* handleLogin: 点击登录按钮 */
 const handleLogin = async () => {
-  errMsg.value = ''
+  errMsg.value = "";
 
   /* 前端校验 */
   if (!cardid.value) {
-    errMsg.value = '请输入卡号'
-    return
+    errMsg.value = "请输入卡号";
+    return;
   }
   if (!password.value) {
-    errMsg.value = '请输入密码'
-    return
+    errMsg.value = "请输入密码";
+    return;
   }
 
   try {
-    const data = await login(cardid.value, password.value)
+    const data = await login(cardid.value, password.value);
 
     if (data.code === 0) {
+      /* 保存 token */
+      saveToken(data.token, data.cardid, data.role);
+
       /* 登录成功，根据 role 跳转 */
       if (data.role === 0) {
-        router.push('/student')
+        router.push("/student");
       } else if (data.role === 1) {
-        router.push('/admin')
+        router.push("/admin");
       }
     } else {
-      errMsg.value = data.message
+      errMsg.value = data.message;
     }
   } catch (e) {
-    console.error('登录错误:', e)
-    errMsg.value = '请求失败: ' + e.message
+    console.error("登录错误:", e);
+    errMsg.value = "请求失败: " + e.message;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -65,6 +89,50 @@ const handleLogin = async () => {
   box-sizing: border-box;
   font-family: "Microsoft YaHei", sans-serif;
 }
+
+.material-symbols-rounded {
+  font-family: "Material Symbols Rounded" !important;
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.form-group input {
+  width: 320px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(138, 146, 206, 0.5);
+  padding: 0 18px 0 44px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.form-group input:focus {
+  border-color: rgb(66, 75, 143);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(66, 75, 143, 0.1);
+}
+
+.form-group input::placeholder {
+  color: rgb(150, 150, 150);
+}
+
+.form-group .icon-prefix {
+  position: absolute;
+  left: calc(50% - 160px + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(117, 116, 116);
+  pointer-events: none;
+  font-size: 20px;
+}
+
 
 .containfather {
   width: 100%;
@@ -85,13 +153,20 @@ const handleLogin = async () => {
   box-shadow: 0 0 12px 3px rgba(0, 0, 0, 0.15);
   background: linear-gradient(45deg, #0779e3d3 50%, #dde1ea 50%);
   background-size: 200% 200%;
-  animation: appleSlopeFlow 7s linear infinite;
+  animation: appleSlopeFlow 15s linear infinite;
   overflow: hidden;
 }
 
 @keyframes appleSlopeFlow {
-  0% { background-position: 0 0; }
-  100% { background-position: 100% 100%; }
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0 0;
+  }
 }
 
 .login-title {
@@ -102,18 +177,43 @@ const handleLogin = async () => {
   margin-bottom: 40px;
 }
 
-.userName, .userPassword {
+.userPassword {
+  position: relative;
   display: flex;
   justify-content: center;
   margin-bottom: 24px;
 }
-.userName input, .userPassword input {
-  width: 75%;
+
+.userPassword input {
+  width: 320px;
   height: 48px;
-  border: 1px solid rgb(74, 74, 74);
-  padding: 0 12px;
-  border-radius: 5px;
-  box-shadow: 0 0 12px 1px rgba(117, 116, 116, 0.15);
+  border-radius: 12px;
+  border: 1px solid rgba(138, 146, 206, 0.5);
+  padding: 0 18px 0 44px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.userPassword input:focus {
+  border-color: rgb(66, 75, 143);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(66, 75, 143, 0.1);
+}
+
+.userPassword input::placeholder {
+  color: rgb(150, 150, 150);
+}
+
+.userPassword .icon-prefix {
+  position: absolute;
+  left: calc(50% - 160px + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(117, 116, 116);
+  pointer-events: none;
+  font-size: 20px;
 }
 
 button {
@@ -122,7 +222,7 @@ button {
   border: 1px solid rgb(193, 191, 191);
   border-radius: 20px;
   margin: 0 auto;
-  background-color: rgb(214, 211, 211);
+  background-color: rgb(214, 211, 211, 0.7);
   transition: all 0.3s ease;
   cursor: pointer;
   font-size: 16px;

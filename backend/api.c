@@ -49,7 +49,9 @@ static void handle_login(struct mg_connection *c, struct mg_http_message *hm){
                 }
                 start_session(cardid, address);
             }
-            send_json(c, 200, "{\"code\":0,\"role\":%d}", role);
+            /* 生成 token */
+            char *token = generate_token(cardid, role);
+            send_json(c, 200, "{\"code\":0,\"role\":%d,\"token\":\"%s\",\"cardid\":\"%s\"}", role, token, cardid);
             break;
         case LOGIN_WRONG_PWD:
             send_json(c, 200, "{\"code\":1,\"message\":\"密码错误\"}");
@@ -166,6 +168,38 @@ static void handle_report_lost(struct mg_connection *c, struct mg_http_message *
     }
 }
 
+/* handle_release_lost: 处理解除挂失请求
+ * 参数:
+ *   c - 连接对象
+ *   hm - HTTP 请求消息
+ */
+static void handle_release_lost(struct mg_connection *c, struct mg_http_message *hm){
+    char cardid[20] = {0};      /* 卡号 */
+    int result;                 /* 解除挂失结果 */
+
+    /* 从 POST 请求体解析参数 */
+    mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
+
+    /* 调用解除挂失函数 */
+    result = release_lost(cardid);
+
+    /* 根据结果返回 JSON */
+    switch(result){
+        case 0:
+            send_json(c, 200, "{\"code\":0,\"message\":\"解除挂失成功\"}");
+            break;
+        case -1:
+            send_json(c, 200, "{\"code\":-1,\"message\":\"用户不存在\"}");
+            break;
+        case -2:
+            send_json(c, 200, "{\"code\":-2,\"message\":\"用户未挂失\"}");
+            break;
+        case -3:
+            send_json(c, 200, "{\"code\":-3,\"message\":\"用户已冻结\"}");
+            break;
+    }
+}
+
 /* handle_reset_password: 处理重置密码请求
  * 参数:
  *   c - 连接对象
@@ -245,16 +279,78 @@ static void handle_find_income(struct mg_connection *c, struct mg_http_message *
     send_json(c, 200, "{\"code\":0,\"total\":%.2f}", total);
 }
 
+/* handle_get_students: 处理获取所有学生列表请求 */
+static void handle_get_students(struct mg_connection *c, struct mg_http_message *hm){
+    User students[MAX_USERS];
+    int student_count = 0;
+    int online_flags[MAX_USERS] = {0};
+    int i;
+
+    get_all_students(students, &student_count, online_flags);
+
+    char buf[16384] = "{\"code\":0,\"students\":[";
+    for(i = 0; i < student_count; i++){
+        if(i > 0) strcat(buf, ",");
+        char item[256];
+        snprintf(item, sizeof(item),
+            "{\"cardid\":\"%s\",\"name\":\"%s\",\"stuid\":\"%s\",\"balance\":%.2f,\"status\":%d,\"isOnline\":%d}",
+            students[i].cardid, students[i].name, students[i].stuid,
+            students[i].balance, (int)students[i].status, online_flags[i]);
+        strcat(buf, item);
+    }
+    strcat(buf, "]}");
+
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", buf);
+}
+
+/* handle_get_recharge_records: 处理获取充值记录请求 */
+static void handle_get_recharge_records(struct mg_connection *c, struct mg_http_message *hm){
+    RechargeRecord records[MAX_RECORDS];
+    int record_count = 0;
+    int i;
+
+    get_all_recharge_records(records, &record_count);
+
+    char *buf = malloc(MAX_RECORDS * 120 + 64);
+    if(buf == NULL){
+        send_json(c, 500, "{\"code\":-1,\"message\":\"服务器内存不足\"}");
+        return;
+    }
+    strcpy(buf, "{\"code\":0,\"records\":[");
+
+    for(i = 0; i < record_count; i++){
+        if(i > 0) strcat(buf, ",");
+        char item[256];
+        snprintf(item, sizeof(item),
+            "{\"cardid\":\"%s\",\"amount\":%.2f,\"date\":\"%s\",\"time\":\"%s\"}",
+            records[i].cardid, records[i].amount, records[i].date, records[i].time);
+        strcat(buf, item);
+    }
+    strcat(buf, "]}");
+
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", buf);
+    free(buf);
+}
+
+/* handle_get_income_stats: 处理获取收入统计请求 */
+static void handle_get_income_stats(struct mg_connection *c, struct mg_http_message *hm){
+    double total = 0, monthly = 0, daily = 0;
+    get_income_stats(&total, &monthly, &daily);
+    send_json(c, 200, "{\"code\":0,\"total\":%.2f,\"monthly\":%.2f,\"daily\":%.2f}", total, monthly, daily);
+}
+
 /* handle_get_student_info: 处理学生查询自己信息请求 */
 static void handle_get_student_info(struct mg_connection *c, struct mg_http_message *hm){
     char cardid[20] = {0};
     User user;
+    Record last_record;
     mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
 
-    int result = get_student_info(cardid, &user);
+    int result = get_student_info(cardid, &user, &last_record);
     if(result == 0){
-        send_json(c, 200, "{\"code\":0,\"cardid\":\"%s\",\"name\":\"%s\",\"stuid\":\"%s\",\"balance\":%.2f,\"status\":%d}",
-                  user.cardid, user.name, user.stuid, user.balance, (int)user.status);
+        send_json(c, 200, "{\"code\":0,\"cardid\":\"%s\",\"name\":\"%s\",\"stuid\":\"%s\",\"balance\":%.2f,\"status\":%d,\"time\":\"%s\",\"address\":\"%s\"}",
+                  user.cardid, user.name, user.stuid, user.balance, (int)user.status,
+                  last_record.time, last_record.address);
     } else {
         send_json(c, 200, "{\"code\":-1,\"message\":\"用户不存在\"}");
     }
@@ -292,6 +388,46 @@ static void handle_end_session(struct mg_connection *c, struct mg_http_message *
     }
 }
 
+/* handle_get_records: 处理查询上机记录请求 */
+static void handle_get_records(struct mg_connection *c, struct mg_http_message *hm){
+    char cardid[20] = {0};
+    Record records[MAX_RECORDS];
+    int record_count = 0;
+    int i;
+
+    mg_http_get_var(&hm->body, "cardid", cardid, sizeof(cardid));
+    load_records(cardid, records, &record_count);
+
+    /* 手动构造 JSON 数组 */
+    char buf[4096] = "{\"code\":0,\"records\":[";
+    for(i = 0; i < record_count; i++){
+        if(i > 0) strcat(buf, ",");
+        char item[256];
+        snprintf(item, sizeof(item), "{\"date\":\"%s\",\"time\":\"%s\",\"duration\":%d,\"isOnline\":%d,\"address\":\"%s\"}",
+                 records[i].date, records[i].time, records[i].duration, records[i].isOnline, records[i].address);
+        strcat(buf, item);
+    }
+    strcat(buf, "]}");
+
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", "%s", buf);
+}
+
+/* handle_verify_token: 处理 token 验证请求 */
+static void handle_verify_token(struct mg_connection *c, struct mg_http_message *hm){
+    char token[64] = {0};
+    char cardid[20] = {0};
+    int role = 0;
+
+    mg_http_get_var(&hm->body, "token", token, sizeof(token));
+
+    int result = verify_token(token, cardid, &role);
+    if(result == 0){
+        send_json(c, 200, "{\"code\":0,\"cardid\":\"%s\",\"role\":%d}", cardid, role);
+    } else {
+        send_json(c, 200, "{\"code\":-1,\"message\":\"token无效或已过期\"}");
+    }
+}
+
 /* handle_api: API 路由总入口
  * 参数:
  *   c - 连接对象
@@ -314,6 +450,10 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     else if(strncmp(hm->uri.buf, "/api/admin/report_lost", 22) == 0){
         handle_report_lost(c, hm);
     }
+    /* 管理员：解除挂失接口 */
+    else if(strncmp(hm->uri.buf, "/api/admin/release_lost", 22) == 0){
+        handle_release_lost(c, hm);
+    }
     /* 管理员：重置密码接口 */
     else if(strncmp(hm->uri.buf, "/api/admin/reset_password", 25) == 0){
         handle_reset_password(c, hm);
@@ -334,6 +474,18 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     else if(strncmp(hm->uri.buf, "/api/admin/find_income", 22) == 0){
         handle_find_income(c, hm);
     }
+    /* 管理员：获取所有学生列表 */
+    else if(strncmp(hm->uri.buf, "/api/admin/get_students", 23) == 0){
+        handle_get_students(c, hm);
+    }
+    /* 管理员：获取充值记录 */
+    else if(strncmp(hm->uri.buf, "/api/admin/get_recharge_records", 31) == 0){
+        handle_get_recharge_records(c, hm);
+    }
+    /* 管理员：获取收入统计 */
+    else if(strncmp(hm->uri.buf, "/api/admin/get_income_stats", 27) == 0){
+        handle_get_income_stats(c, hm);
+    }
     /* 学生：查询自己信息接口 */
     else if(strncmp(hm->uri.buf, "/api/student/info", 17) == 0){
         handle_get_student_info(c, hm);
@@ -345,6 +497,14 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm){
     /* 学生：下机接口 */
     else if(strncmp(hm->uri.buf, "/api/student/end_session", 24) == 0){
         handle_end_session(c, hm);
+    }
+    /* 学生：查询上机记录接口 */
+    else if(strncmp(hm->uri.buf, "/api/student/records", 20) == 0){
+        handle_get_records(c, hm);
+    }
+    /* Token 验证接口 */
+    else if(strncmp(hm->uri.buf, "/api/verify_token", 17) == 0){
+        handle_verify_token(c, hm);
     }
     /* 未匹配的接口 */
     else {

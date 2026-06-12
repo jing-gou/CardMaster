@@ -3,6 +3,82 @@
  * 后端负责维护此文件
  */
 
+/* ========== Token 管理 ========== */
+
+/**
+ * 保存 token 到本地
+ * @param {string} token - token 字符串
+ * @param {string} cardid - 卡号
+ * @param {number} role - 角色
+ */
+export function saveToken(token, cardid, role) {
+  localStorage.setItem('token', token)
+  localStorage.setItem('cardid', cardid)
+  localStorage.setItem('role', role)
+}
+
+/**
+ * 获取本地存储的 token
+ * @returns {string|null}
+ */
+export function getToken() {
+  return localStorage.getItem('token')
+}
+
+/**
+ * 获取本地存储的卡号
+ * @returns {string|null}
+ */
+export function getCardid() {
+  return localStorage.getItem('cardid')
+}
+
+/**
+ * 获取本地存储的角色
+ * @returns {string|null}
+ */
+export function getRole() {
+  return localStorage.getItem('role')
+}
+
+/**
+ * 清除 token（退出登录）
+ */
+export function clearToken() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('cardid')
+  localStorage.removeItem('role')
+}
+
+/**
+ * 检查是否已登录
+ * @returns {boolean}
+ */
+export function isLoggedIn() {
+  return !!localStorage.getItem('token')
+}
+
+/**
+ * 验证 token 是否有效
+ * @returns {Promise<{code: number, cardid?: string, role?: number}>}
+ */
+export async function verifyToken() {
+  const token = getToken()
+  if (!token) {
+    return { code: -1, message: '未登录' }
+  }
+
+  const body = 'token=' + encodeURIComponent(token)
+  const resp = await fetch('/api/verify_token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+/* ========== 登录接口 ========== */
+
 /**
  * 用户登录
  * @param {string} cardid - 卡号
@@ -82,6 +158,23 @@ export async function reportLost(cardid) {
 }
 
 /**
+ * 解除挂失
+ * @param {string} cardid - 卡号
+ * @returns {Promise<{code: number, message: string}>}
+ */
+export async function releaseLost(cardid) {
+  const body = 'cardid=' + encodeURIComponent(cardid)
+
+  const resp = await fetch('/api/admin/release_lost', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+
+/**
  * 重置密码
  * @param {string} cardid - 卡号
  * @param {string} newPassword - 新密码
@@ -147,6 +240,86 @@ export async function changePassword(cardid, oldPassword, newPassword) {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body
+  })
+  return await resp.json()
+}
+
+/**
+ * 查询上机记录
+ * @param {string} cardid - 卡号
+ * @returns {Promise<{code: number, records: Array}>}
+ */
+export async function getRecords(cardid) {
+  const body = 'cardid=' + encodeURIComponent(cardid)
+
+  const resp = await fetch('/api/student/records', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+/**
+ * 管理员统计收入
+ * @returns {Promise<{code: number, total: number}>}
+ */
+export async function findIncome() {
+  const resp = await fetch('/api/admin/find_income', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}
+
+/**
+ * 删除学生
+ * @param {string} cardid - 卡号
+ * @returns {Promise<{code: number, message: string}>}
+ */
+export async function deleteStudent(cardid) {
+  const body = 'cardid=' + encodeURIComponent(cardid)
+
+  const resp = await fetch('/api/admin/delete_student', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  return await resp.json()
+}
+
+/**
+ * 获取所有学生列表（含在线状态）
+ * @returns {Promise<{code: number, students: Array}>}
+ */
+export async function getAllStudents() {
+  const resp = await fetch('/api/admin/get_students', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}
+
+/**
+ * 获取所有充值记录
+ * @returns {Promise<{code: number, records: Array}>}
+ */
+export async function getRechargeRecords() {
+  const resp = await fetch('/api/admin/get_recharge_records', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  })
+  return await resp.json()
+}
+
+/**
+ * 获取收入统计
+ * @returns {Promise<{code: number, total: number, monthly: number, daily: number}>}
+ */
+export async function getIncomeStats() {
+  const resp = await fetch('/api/admin/get_income_stats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   })
   return await resp.json()
 }

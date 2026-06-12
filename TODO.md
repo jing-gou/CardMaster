@@ -3,9 +3,8 @@
 - [x] common.h
 - [x] data.c
 - [x] auth.c
-- [ ] student.c
-- [ ] admin.c
-- [ ] main.c
-- [ ] utils.c
-- [ ] 
+- [x] student.c
+- [x] admin.c
+- [x] main.c
+- [x] utils.c
 

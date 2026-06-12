@@ -1,0 +1,53 @@
+name: Build Backend
+
+on:
+  push:
+    branches: [main, demo]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW
+        uses: bwoodsend/setup-winlibs-action@v1
+        with:
+          with-gcc: true
+
+      - name: Build
+        shell: bash
+        run: |
+          cd backend
+          gcc main.c api.c auth.c data.c admin.c student.c mongoose.c -o server.exe -lws2_32 -Wall
+          ls -lh server.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardmaster-windows
+          path: backend/server.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          cd backend
+          cc main.c api.c auth.c data.c admin.c student.c mongoose.c -o server -Wall
+          ls -lh server
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardmaster-macos
+          path: backend/server

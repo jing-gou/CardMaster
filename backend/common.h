@@ -37,11 +37,29 @@ typedef struct{
     char address[10];
 } Record;
 
+typedef struct{
+    char cardid[10];
+    double amount;
+    char date[20];
+    char time[15];
+} RechargeRecord;
+
+// Token 结构
+typedef struct{
+    char token[64];         /* token 字符串 */
+    char cardid[20];        /* 对应的卡号 */
+    int role;               /* 角色 */
+    time_t expire;          /* 过期时间 */
+} Token;
+
 // 常量定义
 #define MAX_USERS 100
 #define MAX_RECORDS 1000
+#define MAX_TOKENS 100
+#define TOKEN_EXPIRE 3600   /* token 有效期（秒） */
 #define record_dir "data/records/"
 #define DATA_FILE "data/cards.txt"
+#define RECHARGE_FILE "data/recharges.txt"
 
 // 函数声明
 
@@ -54,8 +72,9 @@ void save_records(char *stuid, const Record *REC);
 int delete_user(char *cardid);
 
 // auth.c
-
 LoginResult user_login(char *cardid, char *password, int *role);
+char* generate_token(char *cardid, int role);
+int verify_token(char *token, char *cardid, int *role);
 
 // api.c
 
@@ -66,14 +85,18 @@ void handle_api(struct mg_connection *c, struct mg_http_message *hm);
 int create_student(char *cardid, char *name, char *stuid, char *password);
 int recharge(char *cardid, double amount);
 int report_lost(char *cardid);
+int release_lost(char *cardid);
 int reset_password(char *cardid, char *new_password);
 int delete_student(char *cardid);
 int search_student_info(char *cardid, User *user);
 int edit_student_info(char *cardid, char *name, char *stuid);
 double find_income(void);
+int get_all_students(User students[], int *student_count, int online_flags[]);
+int get_all_recharge_records(RechargeRecord records[], int *record_count);
+void get_income_stats(double *total, double *monthly, double *daily);
 
 // student.c
-int get_student_info(char *cardid, User *user);
+int get_student_info(char *cardid, User *user, Record *last_record);
 int change_password(char *cardid, char *old_password, char *new_password);
 int start_session(char *cardid, char *address);
 int end_session(char *cardid);
