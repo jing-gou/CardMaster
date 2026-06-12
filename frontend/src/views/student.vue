@@ -87,7 +87,7 @@
   grid-template-rows: auto 1fr;
   grid-template-columns: 220px 1fr;
   gap: 20px;
-  padding: 0 20px;
+  padding: 20px 20px 20px 20px;
   box-sizing: border-box;
   width: 100%;
   height: 100vh;
@@ -107,6 +107,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-radius: 16px;
 }
 
 .safari {
@@ -173,7 +174,7 @@ h3 {
 
 .info-row {
   display: flex;
-  padding: 18px 0;
+  padding: 10px 10px;
   border-bottom: 1px solid rgba(138, 146, 206, 0.2);
   transition: background-color 0.2s;
 }
